@@ -2,26 +2,24 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Strona logowania</title>
+<title>Zapomiałem hasła</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
 <link rel="stylesheet" href="http://195.181.218.138/static/styles.css"/>
 </head>
 <body>
-<h1> Zaloguj się </h1>
+<h1> Zapomniałem hasła </h1>
 <p id="message">{{ message }}</p>
 <div id="login">
-<form action="/signin" method="post" name='form-login'>
+<form action="/forget" method="post" name='form-login'>
 <span class="fontawesome-user"></span>
-<input type="text" name="login" placeholder="Username">
+<input type="text" name="login" placeholder="E-mail">
 
-<span class="fontawesome-lock"></span>
-<input type="password" name="password" placeholder="Password">
 
-<input type="submit" value="Login">
+
+<input type="submit" value="Send">
 
 </form>
 </div>
-<a href="forget.html">Zapomniałem hasła?</a>
 </br> Header: {{ headers }}
 </br> Body: {{ body }}
 </br> Data: {{ data }}

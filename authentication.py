@@ -26,3 +26,4 @@ def authentication(login, password):
     if hash == dbhash:
         return True
     return False
+

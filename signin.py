@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from vial import Vial, render_template
-from authentication import authentication
 from add_log import add_log
 from allow_signin import allow_signin
+from authentication import authentication
+from vial import render_template
 
 
 def signin(headers, body, data):
@@ -11,7 +11,7 @@ def signin(headers, body, data):
     if (login == '') or (password == ''):
         return render_template('signin.html', body=body, data=data, headers=headers), 200, {}
     elif allow_signin(login, headers):
-        if (authentication(login, password)):
+        if authentication(login, password):
             add_log(headers, data, True)
             return render_template('signin.html', body=body, data=data, headers=headers, message='Pooprawne dane'), 200, {}
         add_log(headers, data, False)

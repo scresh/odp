@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from vial import Vial, render_template
+from authentication import authentication
+from vial import render_template
 
 def signup(headers, body, data):
     login =  str(data['login']) if 'login' in data else ''

@@ -1,10 +1,10 @@
 import datetime
 import pymysql
 
-def add_log(headers, data, succes=False):
-    login = str(data['login']) if 'login' in data else '-'
+def add_log(headers, login, succes=False):
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print date_time
     conn = pymysql.connect(
         db='odp',
         user='odp',

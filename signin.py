@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from vial import render_template
+from auto_login import auto_login
 from datetime import datetime
 import datetime as dt
 import pymysql
@@ -14,9 +15,11 @@ def signin(headers, body, data):
     elif allow_signin(login, headers):
         if authentication(login, password):
             add_log(headers, data, True)
-            return render_template('signin.html', body=body, data=data, headers=headers, message='Pooprawne dane'), 200, {}
+            return render_template('signin.html', body=body, data=data, headers=headers,
+                                   message='Pooprawne dane'), 200, {}
         add_log(headers, data, False)
-        return render_template('signin.html', body=body, data=data, headers=headers, message='Niepoprawne dane'), 200, {}
+        return render_template('signin.html', body=body, data=data, headers=headers,
+                               message='Niepoprawne dane'), 200, {}
     add_log(headers, data, False)
     return render_template('signin.html', body=body, data=data, headers=headers, message='Ban na IP'), 200, {}
 
@@ -24,10 +27,10 @@ def signin(headers, body, data):
 def allow_signin(login, headers):
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     conn = pymysql.connect(
-        db='odp',
-        user='odp',
-        passwd='qqq',
-        host='localhost')
+        db=auto_login('db_db'),
+        user=auto_login('db_user'),
+        passwd=auto_login('db_passwd'),
+        host=auto_login('db_host'))
     cursor = conn.cursor()
     cursor.execute("SELECT success, time FROM logs WHERE ip=%s AND login=%s ORDER BY time DESC LIMIT 10;", (ip, login))
     cursor_length = 0
@@ -55,10 +58,10 @@ def add_log(headers, data, success=False):
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     date_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn = pymysql.connect(
-        db='odp',
-        user='odp',
-        passwd='qqq',
-        host='localhost')
+        db=auto_login('db_db'),
+        user=auto_login('db_user'),
+        passwd=auto_login('db_passwd'),
+        host=auto_login('db_host'))
     cursor = conn.cursor()
     if success:
         cursor.execute("INSERT INTO logs VALUES (%s, %s, TRUE, %s);", (login, ip, date_time))
@@ -69,10 +72,10 @@ def add_log(headers, data, success=False):
 
 def authentication(login, password):
     conn = pymysql.connect(
-        db='odp',
-        user='odp',
-        passwd='qqq',
-        host='localhost')
+        db=auto_login('db_db'),
+        user=auto_login('db_user'),
+        passwd=auto_login('db_passwd'),
+        host=auto_login('db_host'))
     cursor = conn.cursor()
     cursor.execute("SELECT password FROM userdata WHERE login=%s;", (login,))
     dbhash = cursor.fetchone()

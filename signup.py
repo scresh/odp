@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from vial import render_template
+from auto_login import auto_login
 import math
 import pymysql
 import bcrypt
@@ -43,10 +44,10 @@ def add_user(login, password, email):
     for i in range(3):
         password = bcrypt.hashpw(password, salt)
     conn = pymysql.connect(
-        db='odp',
-        user='odp',
-        passwd='qqq',
-        host='localhost')
+        db=auto_login('db_db'),
+        user=auto_login('db_user'),
+        passwd=auto_login('db_passwd'),
+        host=auto_login('db_host'))
     cursor = conn.cursor()
     cursor.execute("INSERT INTO userdata VALUES (%s, %s, %s);", (login, password, email))
     conn.commit()
@@ -91,10 +92,10 @@ def login_correct_length(login):
 
 def login_not_used(login):
     conn = pymysql.connect(
-        db='odp',
-        user='odp',
-        passwd='qqq',
-        host='localhost')
+        db=auto_login('db_db'),
+        user=auto_login('db_user'),
+        passwd=auto_login('db_passwd'),
+        host=auto_login('db_host'))
     cursor = conn.cursor()
     cursor.execute("SELECT login FROM userdata WHERE login=%s;", (login,))
 
@@ -116,10 +117,10 @@ def email_correct_format(email):
 
 def email_not_used(email):
     conn = pymysql.connect(
-        db='odp',
-        user='odp',
-        passwd='qqq',
-        host='localhost')
+        db=auto_login('db_db'),
+        user=auto_login('db_user'),
+        passwd=auto_login('db_passwd'),
+        host=auto_login('db_host'))
     cursor = conn.cursor()
     cursor.execute("SELECT login FROM userdata WHERE email=%s;", (email,))
 

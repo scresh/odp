@@ -2,7 +2,7 @@
 from vial import Vial, render_template
 from signin import signin
 from signup import signup
-
+from forget import forget
 
 def index(headers, body, data):
     return 'Hello', 200, {}
@@ -22,7 +22,7 @@ routes = {
     '/upload': upload,
     '/signin': signin,
     '/signup': signup,
-    # '/forget': forget,
+     '/forget': forget,
 }
 
 app = Vial(routes, prefix='', static='/static').wsgi_app()

@@ -22,6 +22,7 @@ routes = {
     '/upload': upload,
     '/signin': signin,
     '/signup': signup,
+    # '/forget': forget,
 }
 
-app = Vial(routes, prefix='/bach/drink', static='/static').wsgi_app()
+app = Vial(routes, prefix='', static='/static').wsgi_app()

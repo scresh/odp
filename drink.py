@@ -3,6 +3,10 @@ from vial import Vial, render_template
 from signin import signin
 from signup import signup
 from forget import forget
+from reset import reset
+from view import view
+from home import home
+
 
 def index(headers, body, data):
     return 'Hello', 200, {}
@@ -17,12 +21,16 @@ def upload(headers, body, data):
 
 
 routes = {
-    '/': index,
+    '/': home,
     '/hello/{name}': hello,
     '/upload': upload,
     '/signin': signin,
     '/signup': signup,
-     '/forget': forget,
+    '/forget': forget,
+    '/reset/{token}': reset,
+    '/reset': reset,
+    '/view/{snippet_id}': view,
+
 }
 
 app = Vial(routes, prefix='', static='/static').wsgi_app()

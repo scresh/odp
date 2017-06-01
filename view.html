@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Rejestracja</title>
+    <title>View Snippet</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
     <link rel="stylesheet" href="https://odprojekt.tk/static/styles.css"/>
 </head>
@@ -14,18 +14,11 @@
   <li><a href="/signup">Sign-up</a></li>
   <li><a href="forget">Forgot Passowrd</a></li>
 </ul>
+<h1> View Snippet </h1>
 <p id="message">{{ message }}</p>
-<div id="box">
-    <form action="/signup" method="post">
-        Login: <input type="text" name="login"><br>
-        Hasło: <input type="password" name="password"><br>
-        Email: <input type="text" name="email"><br>
-        <input type="submit" value="Rejestracja">
-        </br> Header: {{ headers }}
-        </br> Body: {{ body }}
-        </br> Data: {{ data }}
-    </form>
-</div>
+<xmp>
+    {{ snippet }}
+</xmp>
 </section>
 </body>
 </html>

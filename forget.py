@@ -51,7 +51,7 @@ def send_mail(email, ip):
     cursor.execute("INSERT INTO tokens VALUES (%s, %s);", (login, token))
     conn.commit()
 
-    msg = 'Hej ' + login + ',\nZ adresu IP: ' + ip + ' zostala wygenerowana prosba o reset hasla\nTwoj token to: ' + token
+    msg = 'Hej ' + login + ',\nZ adresu IP: ' + ip + ' zostala wygenerowana prosba o reset hasla\nKliknij w link aby je zresetowac:\nhttps://odprojekt.tk/reset/' + token
     try:
         server.sendmail(auto_login('mail_user'), email, msg)
     except Exception:

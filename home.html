@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Home</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
+    <link rel="stylesheet" href="https://odprojekt.tk/static/styles.css"/>
+</head>
+<body>
+
+<section>
+    <ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/signin">Sing-in</a></li>
+  <li><a href="/signup">Sign-up</a></li>
+  <li><a href="forget">Forgot Passowrd</a></li>
+</ul>
+  <h1>Recent post</h1>
+  <div class="tbl-header">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Author</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <div class="tbl-content">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tbody>
+      {% for row in values %}
+      <tr><td><a href="https://odprojekt.tk/view/{{ row['id'] }}">{{ row['name'] }}</a></td><td>{{ row['login'] }}</td><td>{{ row['time'] }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+</br> Header: {{ headers }}
+</br> Body: {{ body }}
+</br> Data: {{ data }}
+</body>
+
+</html>

@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Zapomiałem hasła</title>
+<title>Resetuj hasła</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
 <link rel="stylesheet" href="https://odprojekt.tk/static/styles.css"/>
 </head>
@@ -14,14 +14,14 @@
   <li><a href="/signup">Sign-up</a></li>
   <li><a href="forget">Forgot Passowrd</a></li>
 </ul>
-<h1> Zapomniałem hasła </h1>
+<h1> Resetuj hasło </h1>
 <p id="message">{{ message }}</p>
 <div id="box">
-<form action="/forget" method="post">
+<form action="/reset" method="post">
 <span class="fontawesome-user"></span>
-<input type="text" name="email" placeholder="E-mail">
+<input type="password" name="password" placeholder="Password">
+<input type="hidden" name="token" value="{{ token }}">
 <input type="submit" value="Send">
-
 </form>
 </div>
 </br> Header: {{ headers }}

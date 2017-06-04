@@ -7,6 +7,8 @@ from reset import reset
 from view import view
 from home import home
 from redirect import redirect
+from signout import signout
+from add import add
 
 
 def index(headers, body, data):
@@ -32,6 +34,8 @@ routes = {
     '/reset': reset,
     '/view/{snippet_id}': view,
     '/redirect': redirect,
+    '/signout': signout,
+    '/add': add,
 
 }
 

@@ -13,7 +13,6 @@ def signup(headers, body, data):
     login = str(data['login']) if 'login' in data else ''
     password = str(data['password']) if 'password' in data else ''
     email = str(data['email']) if 'email' in data else ''
-    print '|' + login + '|' + password + '|' + email + '|'
     if (login == '') and (password == '') and (email == ''):
         return render_template('html/signup.html', body=body, data=data, headers=headers), 200, {}
     elif not login_correct_length(login):

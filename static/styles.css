@@ -92,7 +92,7 @@ h1{
   height: 50px;
 }
 
-#box form input[type="submit"] {
+form input[type="submit"] {
   background: #b5cd60;
   border: 0;
   width: 100%;
@@ -102,7 +102,7 @@ h1{
   cursor: pointer;
   transition: background 0.3s ease-in-out;
 }
-#box form input[type="submit"]:hover {
+form input[type="submit"]:hover {
   background: #16aa56;
 }
 
@@ -172,7 +172,7 @@ li a:hover {
     background-color: rgba(255,255,255,0.3);
 }
 
-iframe{
+iframe, textarea{
   background: white;
   width: 100%;
   height: 600px;

@@ -11,11 +11,11 @@ def home(headers, body, data):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("SELECT id, name, login, time FROM snippets")
+    cursor.execute("SELECT id, name, login, time FROM snippets ORDER BY time DESC ")
     result = cursor.fetchall()
 
     values = []
     for row in result:
         values.append({'id': str(row[0]), 'name': str(row[1]), 'login': str(row[2]), 'time': str(row[3])})
 
-    return render_template('home.html', body=body, data=data, headers=headers, values=values), 200, {}
+    return render_template('html/home.html', body=body, data=data, headers=headers, values=values), 200, {}

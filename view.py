@@ -10,8 +10,6 @@ def view(headers, body, data, snippet_id='0'):
     except:
         snippet_id = 0
 
-    print str(snippet_id)
-
     conn = pymysql.connect(
         db=auto_login('db_db'),
         user=auto_login('db_user'),
@@ -22,12 +20,7 @@ def view(headers, body, data, snippet_id='0'):
     login = cursor.fetchone()
 
     if login is None:
-        return render_template('view.html', body=body, data=data, message='Snippet does not exist'), 200, {}
-    file_path = 'snippets/' + str(snippet_id) + '.snippet'
-    try:
-        f = open(file_path, 'r')
-        snippet = f.read()
-        f.close()
-        return render_template('view.html', body=body, data=data, snippet=snippet), 200, {}
-    except:
-        return render_template('view.html', body=body, data=data, message='Snippet does not exist'), 200, {}
+        return render_template('html/view.html', body=body, data=data, message='Snippet does not exist'), 200, {}
+    file_path = 'https://odprojekt.tk/static/snippets/' + str(snippet_id) + '.snippet'
+    return render_template('html/view.html', body=body, data=data, file_path=file_path), 200, {}
+

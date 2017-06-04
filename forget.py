@@ -1,22 +1,24 @@
+# -*- coding: utf-8 -*-
 from vial import render_template
 from auto_login import auto_login
 import smtplib
 import uuid
 import pymysql
+import OpenSSL
 
 
 def forget(headers, body, data):
     email = str(data['email']) if 'email' in data else ''
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     if email == '':
-        return render_template('forget.html', body=body, data=data, headers=headers), 200, {}
+        return render_template('html/forget.html', body=body, data=data, headers=headers), 200, {}
     send_mail(email, ip)
-    return render_template('forget.html', body=body, data=data, headers=headers,
+    return render_template('html/forget.html', body=body, data=data, headers=headers,
                            message='Jesli podany email jest wlasciwy wiadomosc zostala wyslana'), 200, {}
 
 
 def send_mail(email, ip):
-    token = str(uuid.uuid4().hex)
+    token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
 
     server = smtplib.SMTP(auto_login('mail_smtp'), auto_login('mail_port'))
     server.ehlo()
@@ -30,7 +32,7 @@ def send_mail(email, ip):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM userdata WHERE email=%s;", (email,))
+    cursor.execute("SELECT login FROM users WHERE email=%s;", (email,))
     login = cursor.fetchone()
 
     if login is None:
@@ -38,13 +40,11 @@ def send_mail(email, ip):
             msg = 'Hej info,\nZ adresu IP: ' + ip + ' odnotowano nieudana probe resetu hasla'
             server.sendmail(auto_login('mail_user'), auto_login('mail_user'), msg)
             server.quit()
-        except Exception:
+        except:
             server.quit()
         return
 
-    login = str(login)
-    login = login.replace("('", "")
-    login = login.replace("',)", "")
+    login = str(login[0])
 
     cursor.execute("DELETE FROM tokens WHERE login = %s", (login,))
     conn.commit()
@@ -54,7 +54,7 @@ def send_mail(email, ip):
     msg = 'Hej ' + login + ',\nZ adresu IP: ' + ip + ' zostala wygenerowana prosba o reset hasla\nKliknij w link aby je zresetowac:\nhttps://odprojekt.tk/reset/' + token
     try:
         server.sendmail(auto_login('mail_user'), email, msg)
-    except Exception:
+    except:
         cursor.execute("DELETE FROM tokens WHERE login = %s", (login,))
         conn.commit()
     server.quit()

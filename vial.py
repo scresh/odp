@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+# encoding=utf8
 from io import BytesIO
 from cgi import FieldStorage
 from parse import parse
 from jinja2 import Template
 from os.path import isfile
 from mimetypes import guess_type
+import sys
 
+reload(sys)
+sys.setdefaultencoding('utf8')
 STATUS_CODE = {
     200: '200 OK',
     201: '201 Created',
@@ -22,8 +26,10 @@ STATUS_CODE = {
     501: '501 Not Implemented',
 }
 
+
 def to_ascii(s):
     return s.encode('utf-8')
+
 
 def to_unicode(s):
     for codec in ['utf-8', 'iso-8859-1']:
@@ -34,6 +40,7 @@ def to_unicode(s):
     print u"Couldn't find the correct codec. Decoded using 'UTF-8'."
     print u"Ignored non-UTF-8 characters. Sorry."
     return s.decode('utf-8', errors='ignore')
+
 
 def serve_static(headers, body, data, filepath):
     if headers['request-method'] not in ['GET', 'HEAD']:
@@ -47,11 +54,13 @@ def serve_static(headers, body, data, filepath):
         return 'File "%s" is not readable' % filepath, 403, {}
     content = to_unicode(f.read())
     content_type, _ = guess_type(filepath)
-    return content, 200, {'Content-Type' : content_type or 'text/plain'}
+    return content, 200, {'Content-Type': content_type or 'text/plain'}
+
 
 def not_found(headers, body, data, uri, prefix):
     return 'Could not find a handler for URI %s (prefix: %s)' \
-         % (uri, prefix), 404, {}
+           % (uri, prefix), 404, {}
+
 
 def render_template(template_filename, **kwargs):
     with open(template_filename, 'r') as f:
@@ -59,12 +68,14 @@ def render_template(template_filename, **kwargs):
         template = Template(template_content)
     return template.render(**kwargs)
 
+
 class FormTextField(object):
     def __init__(self, value):
         self.value = value
 
     def __repr__(self):
         return to_unicode(self.value)
+
 
 class FormFileField(object):
     def __init__(self, filename, headers, stream):
@@ -74,13 +85,14 @@ class FormFileField(object):
 
     def __getattr__(self, name):
         if name is 'value':
-            self.stream.seek(0) # Rewind the file to the beggining
+            self.stream.seek(0)  # Rewind the file to the beggining
             return self.stream.read()
         raise AttributeError, name
 
     def __repr__(self):
         content = self.stream.read(10) + '...'
         return to_unicode('FormFile(filename="%s", value="%s")' % (self.filename, content))
+
 
 class Vial(object):
     def __init__(self, routes, prefix=None, static=None, before=None):
@@ -99,6 +111,7 @@ class Vial(object):
             'remote-addr': environ.get('REMOTE_ADDR', None),
             'request-uri': environ.get('REQUEST_URI', None),
             'http-accept': environ.get('HTTP_ACCEPT', None),
+            'http-cookie': environ.get('HTTP_COOKIE', ''),
             'http-host': environ.get('HTTP_HOST', None),
             'http-accept-language': environ.get('HTTP_ACCEPT_LANGUAGE', None),
             'http-accept-encoding': environ.get('HTTP_ACCEPT_ENCODING', None),
@@ -112,7 +125,7 @@ class Vial(object):
         if self.before is not None:
             return self.before
         return lambda headers: None
-           
+
     def get_handler(self, uri):
         # static routes
         if uri.startswith(self.static):
@@ -136,9 +149,9 @@ class Vial(object):
         for name in fields:
             field = fields[name]
             if field.filename is not None:
-               data[name] = FormFileField(field.filename, field.headers, field.file)
+                data[name] = FormFileField(field.filename, field.headers, field.file)
             else:
-               data[name] = FormTextField(field.value)
+                data[name] = FormTextField(field.value)
 
         return data
 
@@ -149,15 +162,17 @@ class Vial(object):
             handler, args = self.get_handler(uri)
             # Values in data are extracted from the RAW request body.
             data = self.get_data(request_body, request_headers, environ)
+
             def make_response(response):
-               body, status_code, headers = response
-               # WSGI expects headers as a list of tuples
-               # but it is easier to return them from handler
-               # as a dictionary, so I am rewriting it here
-               headers = [(h, v) for h, v in headers.iteritems()]
-               status = STATUS_CODE.get(status_code)
-               start_response(status, headers)
-               return [to_ascii(body)]
+                body, status_code, headers = response
+                # WSGI expects headers as a list of tuples
+                # but it is easier to return them from handler
+                # as a dictionary, so I am rewriting it here
+                headers = [(h, v) for h, v in headers.iteritems()]
+                status = STATUS_CODE.get(status_code)
+                start_response(status, headers)
+                return [to_ascii(body)]
+
             # Jinja2 expects Unicode strings, so to make request_body
             # ready to render, we decode it as unicode.
             # Check the implementation of to_unicode, as it tries
@@ -169,4 +184,5 @@ class Vial(object):
                 return make_response(response)
             response = handler(request_headers, request_body_as_unicode, data, **args)
             return make_response(response)
+
         return app

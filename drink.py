@@ -6,6 +6,7 @@ from forget import forget
 from reset import reset
 from view import view
 from home import home
+from redirect import redirect
 
 
 def index(headers, body, data):
@@ -30,6 +31,7 @@ routes = {
     '/reset/{token}': reset,
     '/reset': reset,
     '/view/{snippet_id}': view,
+    '/redirect': redirect,
 
 }
 

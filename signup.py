@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from vial import render_template
 from auto_login import auto_login
+import datetime as dt
 import math
 import pymysql
 import bcrypt
+import uuid
+import OpenSSL
 
 
 def signup(headers, body, data):
@@ -12,34 +15,37 @@ def signup(headers, body, data):
     email = str(data['email']) if 'email' in data else ''
     print '|' + login + '|' + password + '|' + email + '|'
     if (login == '') and (password == '') and (email == ''):
-        return render_template('signup.html', body=body, data=data, headers=headers), 200, {}
+        return render_template('html/signup.html', body=body, data=data, headers=headers), 200, {}
     elif not login_correct_length(login):
-        return render_template('signup.html', body=body, data=data, headers=headers,
+        return render_template('html/signup.html', body=body, data=data, headers=headers,
                                message='Dlugosc loginu powinna liczyc od 3 do 16 znakow'), 200, {}
     elif not login_correct_chars(login):
-        return render_template('signup.html', body=body, data=data, headers=headers,
+        return render_template('html/signup.html', body=body, data=data, headers=headers,
                                message='Login zawiera nidozwolone znaki'), 200, {}
     elif not login_not_used(login):
-        return render_template('signup.html', body=body, data=data, headers=headers,
+        return render_template('html/signup.html', body=body, data=data, headers=headers,
                                message='Podany login jest juz zajety'), 200, {}
     elif not pass_correct_length(password):
-        return render_template('signup.html', body=body, data=data, headers=headers,
+        return render_template('html/signup.html', body=body, data=data, headers=headers,
                                message='Dlugosc hasla powinna liczyc od 6 do 24 znakow'), 200, {}
     elif not pass_good_entropy(password):
-        return render_template('signup.html', body=body, data=data, headers=headers,
+        return render_template('html/signup.html', body=body, data=data, headers=headers,
                                message='Haslo zbyt proste'), 200, {}
     elif not email_correct_format(email):
-        return render_template('signup.html', body=body, data=data, headers=headers,
+        return render_template('html/signup.html', body=body, data=data, headers=headers,
                                message='Niepoprwany adres email'), 200, {}
     elif not email_not_used(email):
-        return render_template('signup.html', body=body, data=data, headers=headers,
+        return render_template('html/signup.html', body=body, data=data, headers=headers,
                                message='Podany email jest juz zajety'), 200, {}
-    add_user(login, password, email)
-    return render_template('signup.html', body=body, data=data, headers=headers,
-                           message='Poprawne dane'), 200, {}
+    cookie = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+    expires = (dt.datetime.utcnow() + dt.timedelta(days=1)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    add_user(login, password, email, cookie, expires)
+    cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
+    return render_template('html/redirect.html', body=body, data=data, headers=headers,
+                           message='Successfully signed up'), 200, {'Set-Cookie': cookie}
 
 
-def add_user(login, password, email):
+def add_user(login, password, email, cookie, expires):
     salt = bcrypt.gensalt()
     for i in range(3):
         password = bcrypt.hashpw(password, salt)
@@ -49,7 +55,7 @@ def add_user(login, password, email):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO userdata VALUES (%s, %s, %s);", (login, password, email))
+    cursor.execute("INSERT INTO users VALUES (%s, %s, %s, %s, %s);", (login, password, email, cookie, expires))
     conn.commit()
 
 
@@ -97,7 +103,7 @@ def login_not_used(login):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM userdata WHERE login=%s;", (login,))
+    cursor.execute("SELECT login FROM users WHERE login=%s;", (login,))
 
     if cursor.fetchone() is None:
         return True
@@ -122,7 +128,7 @@ def email_not_used(email):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM userdata WHERE email=%s;", (email,))
+    cursor.execute("SELECT login FROM users WHERE email=%s;", (email,))
 
     if cursor.fetchone() is None:
         return True

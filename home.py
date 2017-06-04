@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from vial import render_template
 import pymysql
 from auto_login import auto_login

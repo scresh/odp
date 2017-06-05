@@ -12,9 +12,25 @@ def forget(headers, body, data):
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     if email == '':
         return render_template('html/forget.html', body=body, data=data, headers=headers), 200, {}
+    if not email_correct_format(email):
+        return render_template('html/forget.html', body=body, data=data, headers=headers,
+                               message='Email address is in an invalid format'), 200, {}
     send_mail(email, ip)
     return render_template('html/forget.html', body=body, data=data, headers=headers,
-                           message='Jesli podany email jest wlasciwy wiadomosc zostala wyslana'), 200, {}
+                           message='A reset password link has been sent to you via email'), 200, {}
+
+
+def email_correct_format(email):
+    if not 6 <= len(email) <= 30:
+        return False
+    elif email.count('@') != 1 or not (0 < email.index('@') < (len(email) - 4)):
+        return False
+    elif email.count('.') == 0:
+        return False
+    for c in email:
+        if not ((96 < ord(c) < 123) or (63 < ord(c) < 91) or (47 < ord(c) < 58) or ord(c) == 46):
+            return False
+    return True
 
 
 def send_mail(email, ip):
@@ -37,7 +53,7 @@ def send_mail(email, ip):
 
     if login is None:
         try:
-            msg = 'Hej info,\nZ adresu IP: ' + ip + ' odnotowano nieudana probe resetu hasla'
+            msg = 'Hi info,\nA incorrect request to reset password was noticed from IP: ' + ip
             server.sendmail(auto_login('mail_user'), auto_login('mail_user'), msg)
             server.quit()
         except:
@@ -51,7 +67,7 @@ def send_mail(email, ip):
     cursor.execute("INSERT INTO tokens VALUES (%s, %s);", (login, token))
     conn.commit()
 
-    msg = 'Hej ' + login + ',\nZ adresu IP: ' + ip + ' zostala wygenerowana prosba o reset hasla\nKliknij w link aby je zresetowac:\nhttps://odprojekt.tk/reset/' + token
+    msg = 'Hej ' + login + ',\nWe have received a request to reset your password from IP: ' + ip + '\nPlease confirm: https://odprojekt.tk/reset/' + token
     try:
         server.sendmail(auto_login('mail_user'), email, msg)
     except:

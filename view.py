@@ -21,6 +21,6 @@ def view(headers, body, data, snippet_id='0'):
 
     if login is None:
         return render_template('html/view.html', body=body, data=data, message='Snippet does not exist'), 200, {}
-    file_path = 'https://odprojekt.tk/static/snippets/' + str(snippet_id) + '.snippet'
-    return render_template('html/view.html', body=body, data=data, file_path=file_path), 200, {}
+    snippet_path = 'https://odprojekt.tk/static/snippets/' + str(snippet_id) + '.snippet'
+    return render_template('html/view.html', body=body, data=data, snippet_path=snippet_path), 200, {}
 

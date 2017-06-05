@@ -17,28 +17,29 @@ def signup(headers, body, data):
         return render_template('html/signup.html', body=body, data=data, headers=headers), 200, {}
     elif not login_correct_length(login):
         return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Dlugosc loginu powinna liczyc od 3 do 16 znakow'), 200, {}
+                               message='Username length should be 3-16 characters'), 200, {}
     elif not login_correct_chars(login):
         return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Login zawiera nidozwolone znaki'), 200, {}
+                               message='Username contains invalid characters'), 200, {}
     elif not login_not_used(login):
         return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Podany login jest juz zajety'), 200, {}
+                               message='Username is already in use'), 200, {}
     elif not pass_correct_length(password):
         return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Dlugosc hasla powinna liczyc od 6 do 24 znakow'), 200, {}
-    elif not pass_good_entropy(password):
+                               message='Password length should be 6-24 characters'), 200, {}
+    elif pass_entropy(password) < 50.0:
         return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Haslo zbyt proste'), 200, {}
+                               message='Password is too simple. Entropy: ' + str(round(pass_entropy(password), 2))), 200, {}
     elif not email_correct_format(email):
         return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Niepoprwany adres email'), 200, {}
+                               message='Email address is in an invalid format'), 200, {}
     elif not email_not_used(email):
         return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Podany email jest juz zajety'), 200, {}
+                               message='Email address is already in use'), 200, {}
     cookie = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
-    expires = (dt.datetime.utcnow() + dt.timedelta(days=1)).strftime("%a, %d %b %Y %H:%M:%S GMT")
-    add_user(login, password, email, cookie, expires)
+    expires = (dt.datetime.utcnow() + dt.timedelta(days=1))
+    add_user(login, password, email, cookie, expires.strftime("%Y-%m-%d %H:%M:%S"))
+    expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
     cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
     return render_template('html/redirect.html', body=body, data=data, headers=headers,
                            message='Successfully signed up'), 200, {'Set-Cookie': cookie}
@@ -58,7 +59,7 @@ def add_user(login, password, email, cookie, expires):
     conn.commit()
 
 
-def pass_good_entropy(password):
+def pass_entropy(password):
     small = big = num = spec = 0
     for c in password:
         if 96 < ord(c) < 123:
@@ -71,9 +72,7 @@ def pass_good_entropy(password):
             spec = 1
     alpha = small * 26 + big * 26 + num * 10 + spec * 66
     entropy = len(password) * math.log(alpha if alpha > 0 else 1, 2)
-    if entropy > 50.0:
-        return True
-    return False
+    return entropy
 
 
 def pass_correct_length(password):
@@ -109,14 +108,16 @@ def login_not_used(login):
     return False
 
 
-# To be continued...
 def email_correct_format(email):
     if not 6 <= len(email) <= 30:
         return False
-    elif email.count('@') != 1:
+    elif email.count('@') != 1 or not (0 < email.index('@') < (len(email) - 4)):
         return False
     elif email.count('.') == 0:
         return False
+    for c in email:
+        if not ((96 < ord(c) < 123) or (63 < ord(c) < 91) or (47 < ord(c) < 58) or ord(c) == 46):
+            return False
     return True
 
 

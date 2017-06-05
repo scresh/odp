@@ -31,9 +31,9 @@ def signin(headers, body, data):
                                    message='Successfully signed in'), 200, {'Set-Cookie': cookie}
         add_log(headers, data, False)
         return render_template('html/signin.html', body=body, data=data, headers=headers,
-                               message='Niepoprawne dane'), 200, {}
+                               message='Invalid Login Credentials'), 200, {}
     add_log(headers, data, False)
-    return render_template('html/signin.html', body=body, data=data, headers=headers, message='Ban na IP'), 200, {}
+    return render_template('html/signin.html', body=body, data=data, headers=headers, message='Too many login failures from your newtwork'), 200, {}
 
 
 def allow_signin(login, headers):

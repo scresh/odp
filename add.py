@@ -27,7 +27,7 @@ def add(headers, body, data):
     return redirect(headers=headers, body=body, data=data, message='Your snippet has been successfully added.')
 
 
-def add_snippet(title, snippet, login):
+def add_snippet(title, snippet_content, login):
     conn = pymysql.connect(
         db=auto_login('db_db'),
         user=auto_login('db_user'),
@@ -41,5 +41,5 @@ def add_snippet(title, snippet, login):
     conn.commit()
     snippet_path = 'static/snippets/' + str(id) + '.snippet'
     snippet_file = open(snippet_path, 'w+')
-    snippet_file.write(snippet)
+    snippet_file.write(snippet_content)
     snippet_file.close()

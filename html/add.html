@@ -20,6 +20,7 @@
             <form action="/add" method="post">
                 <input type="text" name="title" placeholder="Title">
                 <textarea name="snippet"></textarea>
+                <input type="hidden" name="token" value="{{token}}">
                 <input type="submit" value="Send">
             </form>
         </section>

@@ -37,6 +37,7 @@ routes = {
     '/redirect': redirect,
     '/signout': signout,
     '/add': add,
+    '/add/{token}': add,
     '/change': change,
     '/change/{token}': change,
 

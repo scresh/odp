@@ -2,14 +2,14 @@
 from vial import render_template
 from auto_login import auto_login
 import datetime as dt
-from cookie import whose_cookie
+from cookie import user_cookie
 from redirect import redirect
 import pymysql
 
 
 def add(headers, body, data):
     cookie = str(headers['http-cookie']).replace('sessionid=', '')
-    login = whose_cookie(cookie)
+    login = user_cookie(cookie)
     if login == '':
         return redirect(headers=headers, body=body, data=data, message='You must be signed-in to be able to add snippets')
     snippet = str(data['snippet']) if 'snippet' in data else ''

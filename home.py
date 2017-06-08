@@ -2,9 +2,11 @@
 from vial import render_template
 import pymysql
 from auto_login import auto_login
+from cookie import token_cookie
 
 
 def home(headers, body, data):
+    cookie = str(headers['http-cookie']).replace('sessionid=', '')
     conn = pymysql.connect(
         db=auto_login('db_db'),
         user=auto_login('db_user'),
@@ -17,5 +19,5 @@ def home(headers, body, data):
     values = []
     for row in result:
         values.append({'id': str(row[0]), 'name': str(row[1]), 'login': str(row[2]), 'time': str(row[3])})
-
-    return render_template('html/home.html', body=body, data=data, headers=headers, values=values), 200, {}
+    token = token_cookie(cookie)
+    return render_template('html/home.html', body=body, data=data, headers=headers, values=values, token=token), 200, {}

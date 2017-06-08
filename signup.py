@@ -38,14 +38,15 @@ def signup(headers, body, data):
                                message='Email address is already in use'), 200, {}
     cookie = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
     expires = (dt.datetime.utcnow() + dt.timedelta(days=1))
-    add_user(login, password, email, cookie, expires.strftime("%Y-%m-%d %H:%M:%S"))
+    token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+    add_user(login, password, email, cookie, expires.strftime("%Y-%m-%d %H:%M:%S"), token)
     expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
     cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
     return render_template('html/redirect.html', body=body, data=data, headers=headers,
                            message='Successfully signed up'), 200, {'Set-Cookie': cookie}
 
 
-def add_user(login, password, email, cookie, expires):
+def add_user(login, password, email, cookie, expires, token):
     salt = bcrypt.gensalt()
     for i in range(3):
         password = bcrypt.hashpw(password, salt)
@@ -55,7 +56,7 @@ def add_user(login, password, email, cookie, expires):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users VALUES (%s, %s, %s, %s, %s);", (login, password, email, cookie, expires))
+    cursor.execute("INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s);", (login, password, email, cookie, expires, token))
     conn.commit()
 
 

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import uuid
+import OpenSSL
 from vial import render_template
 from auto_login import auto_login
 import pymysql
@@ -13,7 +15,7 @@ def reset(headers, body, data, token=''):
         token = str(data['token']) if 'token' in data else ''
 
     if token == '':
-        return render_template('html/reset.html', body=body, data=data), 200, {}
+        return render_template('html/reset.html', body=body, data=data, token=token), 200, {}
 
     if password == '':
         return render_template('html/reset.html', body=body, data=data,  token=token), 200, {}
@@ -24,27 +26,26 @@ def reset(headers, body, data, token=''):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM tokens WHERE token=%s;", (token,))
+    cursor.execute("SELECT login FROM users WHERE token=%s;", (token,))
     login = cursor.fetchone()
 
     if login is None:
-        return render_template('html/reset.html', body=body, data=data, message='Invalid token'), 200, {}
+        return render_template('html/reset.html', body=body, data=data, message='Invalid token', token=token), 200, {}
 
     elif not pass_correct_length(password):
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
-                               message='Password length should be 6-24 characters'), 200, {}
+        return render_template('html/reset.html', body=body, data=data, headers=headers,
+                               message='Password length should be 6-24 characters', token=token), 200, {}
     elif pass_entropy(password) < 50.0:
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('html/reset.html', body=body, data=data, headers=headers, token=token,
                                message='Password is too simple. Entropy: ' + str(round(pass_entropy(password), 2))), 200, {}
     salt = bcrypt.gensalt()
     for i in range(3):
         password = bcrypt.hashpw(password, salt)
 
     login = str(login[0])
-    cursor.execute("DELETE FROM tokens WHERE login=%s", (login,))
-    conn.commit()
+    token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
 
-    cursor.execute("UPDATE users SET password=%s WHERE login=%s;", (password, login))
+    cursor.execute("UPDATE users SET password=%s, token=%s WHERE login=%s;", (password, token, login))
     conn.commit()
     return redirect(headers=headers, body=body, data=data, message='Password has been successfully changed.')
 

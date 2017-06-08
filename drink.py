@@ -9,6 +9,7 @@ from home import home
 from redirect import redirect
 from signout import signout
 from add import add
+from change import change
 
 
 def index(headers, body, data):
@@ -36,6 +37,8 @@ routes = {
     '/redirect': redirect,
     '/signout': signout,
     '/add': add,
+    '/change': change,
+    '/change/{token}': change,
 
 }
 

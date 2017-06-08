@@ -34,8 +34,6 @@ def email_correct_format(email):
 
 
 def send_mail(email, ip):
-    token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
-
     server = smtplib.SMTP(auto_login('mail_smtp'), auto_login('mail_port'))
     server.ehlo()
     server.starttls()
@@ -48,29 +46,19 @@ def send_mail(email, ip):
         passwd=auto_login('db_passwd'),
         host=auto_login('db_host'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM users WHERE email=%s;", (email,))
-    login = cursor.fetchone()
+    cursor.execute("SELECT login, token FROM users WHERE email=%s;", (email,))
+    fetch = cursor.fetchone()
+    login = fetch[0]
 
     if login is None:
-        try:
-            msg = 'Hi info,\nA incorrect request to reset password was noticed from IP: ' + ip
-            server.sendmail(auto_login('mail_user'), auto_login('mail_user'), msg)
-            server.quit()
-        except:
-            server.quit()
+        msg = 'Hi info,\nA incorrect request to reset password was noticed from IP: ' + ip
+        server.sendmail(auto_login('mail_user'), auto_login('mail_user'), msg)
+        server.quit()
         return
 
-    login = str(login[0])
+    login = str(login)
+    token = str(fetch[1])
 
-    cursor.execute("DELETE FROM tokens WHERE login = %s", (login,))
-    conn.commit()
-    cursor.execute("INSERT INTO tokens VALUES (%s, %s);", (login, token))
-    conn.commit()
-
-    msg = 'Hej ' + login + ',\nWe have received a request to reset your password from IP: ' + ip + '\nPlease confirm: https://odprojekt.tk/reset/' + token
-    try:
-        server.sendmail(auto_login('mail_user'), email, msg)
-    except:
-        cursor.execute("DELETE FROM tokens WHERE login = %s", (login,))
-        conn.commit()
+    msg = 'Hi ' + login + ',\nWe have received a request to reset your password from IP: ' + ip + '\nPlease confirm: https://odprojekt.tk/reset/' + token
+    server.sendmail(auto_login('mail_user'), email, msg)
     server.quit()

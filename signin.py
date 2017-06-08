@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from redirect import redirect
 from vial import render_template
-from cookie import whose_cookie, update_cookie
+from cookie import user_cookie, update_cookie
 from auto_login import auto_login
 from datetime import datetime
 import datetime as dt
@@ -16,7 +16,7 @@ def signin(headers, body, data):
     password = str(data['password']) if 'password' in data else ''
     cookie = str(headers['http-cookie']).replace('sessionid=', '')
     if (login == '') or (password == ''):
-        if whose_cookie(cookie) != '':
+        if user_cookie(cookie) != '':
             return redirect(headers=headers, body=body, data=data, message='You are arleady signed in')
         return render_template('html/signin.html', body=body, data=data, headers=headers), 200, {}
     elif allow_signin(login, headers):
@@ -90,9 +90,13 @@ def authentication(login, password):
     dbhash = cursor.fetchone()
 
     if dbhash is None:
+        dbhash = '$2b$12$c/d7ZeuRgBPXvlktF7OH3uUF3DQFyq5FJnqmzbvKWMA6Et.e7Knrm';
+        salt = dbhash[0:29]
+        hash = password
         for i in range(3):
-            bcrypt.hashpw('wrong data delay', bcrypt.gensalt())
+            hash = bcrypt.hashpw(hash, salt)
         return False
+
     dbhash = str(dbhash[0])
     salt = dbhash[0:29]
     hash = password

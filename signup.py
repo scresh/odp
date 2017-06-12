@@ -7,6 +7,7 @@ import pymysql
 import bcrypt
 import uuid
 import OpenSSL
+import os
 
 
 def signup(headers, body, data):
@@ -57,6 +58,7 @@ def add_user(login, password, email, cookie, expires, token):
         host=auto_login('db_host'))
     cursor = conn.cursor()
     cursor.execute("INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s);", (login, password, email, cookie, expires, token))
+    os.mkdir('uploads/'+login)
     conn.commit()
 
 

@@ -76,6 +76,24 @@ def tk_login(token, cookie):
     return ''
 
 
+def tk_login(token, cookie):
+    if token == '' or cookie == '':
+        return ''
+    conn = pymysql.connect(
+        db=auto_login('db_db'),
+        user=auto_login('db_user'),
+        passwd=auto_login('db_passwd'),
+        host=auto_login('db_host'))
+    cursor = conn.cursor()
+    cursor.execute("SELECT login, cookie, expires FROM users WHERE token=%s;", (token,))
+    data = cursor.fetchone()
+
+    if data is not None:
+        if cookie == str(data[1]) and datetime.strptime(str(data[2]), "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
+            return str(data[0])
+    return ''
+
+
 def update_cookie(cookie, expires, login):
     conn = pymysql.connect(
         db=auto_login('db_db'),

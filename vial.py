@@ -169,7 +169,7 @@ class Vial(object):
                 # but it is easier to return them from handler
                 # as a dictionary, so I am rewriting it here
                 headers = [(h, v) for h, v in headers.iteritems()]
-                status = STATUFS_CODE.get(status_code)
+                status = STATUS_CODE.get(status_code)
                 start_response(status, headers)
                 return [to_ascii(body)]
 

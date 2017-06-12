@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from vial import render_template
 from auto_login import auto_login
+from redirect import redirect
 import pymysql
 
 
@@ -20,7 +21,6 @@ def view(headers, body, data, snippet_id='0'):
     login = cursor.fetchone()
 
     if login is None:
-        return render_template('html/view.html', body=body, data=data, message='Snippet does not exist'), 200, {}
+        return redirect(headers=headers, body=body, data=data, message='Snippet does not exist')
     snippet_path = 'https://odprojekt.tk/static/snippets/' + str(snippet_id) + '.snippet'
     return render_template('html/view.html', body=body, data=data, snippet_path=snippet_path), 200, {}
-

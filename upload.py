@@ -34,8 +34,8 @@ def upload(headers, body, data, token=''):
             host=auto_login('db_host'))
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM uploads ORDER BY id DESC LIMIT 1;")
-        id = int(cursor.fetchone()[0]) + 1
-
+        fetch = cursor.fetchone()
+        id = (int(fetch[0]) + 1) if fetch is not None else 0
         cursor.execute("SELECT login FROM uploads WHERE login=%s AND filename=%s", (login, file_name))
         if cursor.fetchone() is None:
             cursor.execute("INSERT INTO uploads VALUES (%s, %s, %s, %s);", (file_name, id, login, date_time))

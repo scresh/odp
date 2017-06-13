@@ -52,7 +52,8 @@ def add_snippet(title, snippet_content, login):
         host=auto_login('db_host'))
     cursor = conn.cursor()
     cursor.execute("SELECT id, time FROM snippets ORDER BY id DESC LIMIT 1;")
-    id = int(cursor.fetchone()[0]) + 1
+    fetch = cursor.fetchone()
+    id = (int(fetch[0]) + 1)if fetch is not None else 0
     date_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute("INSERT INTO snippets VALUES (%s, %s, %s, %s);", (title, id, login, date_time))
     conn.commit()

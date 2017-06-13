@@ -3,14 +3,12 @@
 
 import os
 from mimetypes import guess_type
-
-import sys
-
-from vial import to_unicode, to_ascii
+from vial import to_unicode
 from cookie import user_cookie
 from redirect import redirect
 from auto_login import auto_login
 import pymysql
+from cherrypy.lib.static import serve_file
 
 
 def download(headers, body, data, id=''):
@@ -33,17 +31,17 @@ def download(headers, body, data, id=''):
     if login != str(fetch[0]):
         return redirect(headers=headers, body=body, data=data,
                         message='You do not have permission to download this file')
-    file_path = '/uploads/' + login + '/' + str(fetch[1])
+    file_path = 'uploads/' + login + '/' + str(fetch[1])
     f = open(file_path, 'rb')
-    content = to_unicode(f.read())
+    #content = to_unicode(f.read())
+    content = str(to_unicode(f.read())).encode()
     content_type = str(guess_type(file_path)[0])
     return content, 200, {'request-method': 'GET',
                           'Content-Description': 'File Transfer',
                           'Content-Type': content_type,
-                          'Content-Disposition': 'attachment, filename=' + str(fetch[1]),
+                          'Content-Disposition': 'attachment; filename="' + str(fetch[1]) + '"',
                           'Content-Transfer-Encoding': 'binary',
                           'Expires': '0',
-                         'Cache-Control': 'must-revalidate, post-check=0, pre-check=0',
-                         'Pragma': 'public',
-                          'Content-Length': str(os.stat(file_path).st_size)
-                          }
+                          'Cache-Control': 'must-revalidate',
+                          'Pragma': 'public',
+                          'Content-Length': str(os.stat(file_path).st_size)}

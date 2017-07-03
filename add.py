@@ -22,12 +22,12 @@ def add(headers, body, data, token=''):
     title = str(data['title']) if 'title' in data else ''
 
     if (snippet == '') or (title == ''):
-        return render_template('html/add.html', body=body, data=data, headers=headers, token=token), 200, {}
+        return render_template('templates/add.html', body=body, data=data, headers=headers, token=token), 200, {}
     elif len(title) > 60:
-        return render_template('html/add.html', body=body, data=data, headers=headers, token=token,
+        return render_template('templates/add.html', body=body, data=data, headers=headers, token=token,
                                message='Title length should not be longer than 60 characters'), 200, {}
     elif len(snippet) > 6000:
-        return render_template('html/add.html', body=body, data=data, headers=headers, token=token,
+        return render_template('templates/add.html', body=body, data=data, headers=headers, token=token,
                                message='Snippet length should not be longer than 6000 characters'), 200, {}
     add_snippet(title, snippet, login)
     new_token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)

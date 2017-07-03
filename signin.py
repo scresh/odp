@@ -18,7 +18,7 @@ def signin(headers, body, data):
     if (login == '') or (password == ''):
         if user_cookie(cookie) != '':
             return redirect(headers=headers, body=body, data=data, message='You are arleady signed in')
-        return render_template('html/signin.html', body=body, data=data, headers=headers), 200, {}
+        return render_template('templates/signin.html', body=body, data=data, headers=headers), 200, {}
     elif allow_signin(login, headers):
         if authentication(login, password):
             cookie = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
@@ -27,13 +27,13 @@ def signin(headers, body, data):
             expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
             cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
             add_log(headers, data, True)
-            return render_template('html/redirect.html', body=body, data=data, headers=headers,
+            return render_template('templates/redirect.html', body=body, data=data, headers=headers,
                                    message='Successfully signed in'), 200, {'Set-Cookie': cookie}
         add_log(headers, data, False)
-        return render_template('html/signin.html', body=body, data=data, headers=headers,
+        return render_template('templates/signin.html', body=body, data=data, headers=headers,
                                message='Invalid Login Credentials'), 200, {}
     add_log(headers, data, False)
-    return render_template('html/signin.html', body=body, data=data, headers=headers, message='Too many login failures from your newtwork'), 200, {}
+    return render_template('templates/signin.html', body=body, data=data, headers=headers, message='Too many login failures from your newtwork'), 200, {}
 
 
 def allow_signin(login, headers):

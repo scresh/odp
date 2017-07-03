@@ -15,10 +15,10 @@ def reset(headers, body, data, token=''):
         token = str(data['token']) if 'token' in data else ''
 
     if token == '':
-        return render_template('html/reset.html', body=body, data=data, token=token), 200, {}
+        return render_template('templates/reset.html', body=body, data=data, token=token), 200, {}
 
     if password == '':
-        return render_template('html/reset.html', body=body, data=data,  token=token), 200, {}
+        return render_template('templates/reset.html', body=body, data=data,  token=token), 200, {}
 
     conn = pymysql.connect(
         db=auto_login('db_db'),
@@ -30,13 +30,13 @@ def reset(headers, body, data, token=''):
     login = cursor.fetchone()
 
     if login is None:
-        return render_template('html/reset.html', body=body, data=data, message='Invalid token', token=token), 200, {}
+        return render_template('templates/reset.html', body=body, data=data, message='Invalid token', token=token), 200, {}
 
     elif not pass_correct_length(password):
-        return render_template('html/reset.html', body=body, data=data, headers=headers,
+        return render_template('templates/reset.html', body=body, data=data, headers=headers,
                                message='Password length should be 6-24 characters', token=token), 200, {}
     elif pass_entropy(password) < 50.0:
-        return render_template('html/reset.html', body=body, data=data, headers=headers, token=token,
+        return render_template('templates/reset.html', body=body, data=data, headers=headers, token=token,
                                message='Password is too simple. Entropy: ' + str(round(pass_entropy(password), 2))), 200, {}
     salt = bcrypt.gensalt()
     for i in range(3):

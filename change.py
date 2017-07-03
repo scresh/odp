@@ -20,7 +20,7 @@ def change(headers, body, data, token=''):
         token = str(data['token']) if 'token' in data else ''
     db_password = tk_pass(token, cookie)
     if current == '' or password1 == '' or password2 == '':
-        return render_template('html/change.html', body=body, data=data, token=token), 200, {}
+        return render_template('templates/change.html', body=body, data=data, token=token), 200, {}
     elif db_password == '':
         return redirect(headers=headers, body=body, data=data, message='Unauthorized password change request')
     salt = db_password[0:29]
@@ -28,13 +28,13 @@ def change(headers, body, data, token=''):
         current = bcrypt.hashpw(current, salt)
 
     if current != db_password:
-        return render_template('html/change.html', body=body, data=data, token=token, message='Current password is incorrect'), 200, {}
+        return render_template('templates/change.html', body=body, data=data, token=token, message='Current password is incorrect'), 200, {}
     elif password1 != password2:
-        return render_template('html/change.html', body=body, data=data, token=token, message='Passwords must be identical'), 200, {}
+        return render_template('templates/change.html', body=body, data=data, token=token, message='Passwords must be identical'), 200, {}
     elif not pass_correct_length(password1):
-        return render_template('html/change.html', body=body, data=data,  token=token, message='New password length should be 6-24 characters'), 200, {}
+        return render_template('templates/change.html', body=body, data=data,  token=token, message='New password length should be 6-24 characters'), 200, {}
     elif pass_entropy(password1) < 50.0:
-        return render_template('html/change.html', body=body, data=data, token=token, message='New password is too simple. Entropy: ' + str(round(pass_entropy(password1), 2))), 200, {}
+        return render_template('templates/change.html', body=body, data=data, token=token, message='New password is too simple. Entropy: ' + str(round(pass_entropy(password1), 2))), 200, {}
     salt = bcrypt.gensalt()
     for i in range(3):
         password1 = bcrypt.hashpw(password1, salt)

@@ -15,27 +15,27 @@ def signup(headers, body, data):
     password = str(data['password']) if 'password' in data else ''
     email = str(data['email']) if 'email' in data else ''
     if (login == '') and (password == '') and (email == ''):
-        return render_template('html/signup.html', body=body, data=data, headers=headers), 200, {}
+        return render_template('templates/signup.html', body=body, data=data, headers=headers), 200, {}
     elif not login_correct_length(login):
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Username length should be 3-16 characters'), 200, {}
     elif not login_correct_chars(login):
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Username contains invalid characters'), 200, {}
     elif not login_not_used(login):
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Username is already in use'), 200, {}
     elif not pass_correct_length(password):
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Password length should be 6-24 characters'), 200, {}
     elif pass_entropy(password) < 50.0:
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Password is too simple. Entropy: ' + str(round(pass_entropy(password), 2))), 200, {}
     elif not email_correct_format(email):
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Email address is in an invalid format'), 200, {}
     elif not email_not_used(email):
-        return render_template('html/signup.html', body=body, data=data, headers=headers,
+        return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Email address is already in use'), 200, {}
     cookie = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
     expires = (dt.datetime.utcnow() + dt.timedelta(days=1))
@@ -43,7 +43,7 @@ def signup(headers, body, data):
     add_user(login, password, email, cookie, expires.strftime("%Y-%m-%d %H:%M:%S"), token)
     expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
     cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
-    return render_template('html/redirect.html', body=body, data=data, headers=headers,
+    return render_template('templates/redirect.html', body=body, data=data, headers=headers,
                            message='Successfully signed up'), 200, {'Set-Cookie': cookie}
 
 
@@ -86,7 +86,7 @@ def pass_correct_length(password):
 
 def login_correct_chars(login):
     for c in login:
-        if not (96 < ord(c) < 123) or (64 < ord(c) < 91) or (47 < ord(c) < 58):
+        if not ((96 < ord(c) < 123) or (64 < ord(c) < 91) or (47 < ord(c) < 58)):
             return False
     return True
 

@@ -11,12 +11,12 @@ def forget(headers, body, data):
     email = str(data['email']) if 'email' in data else ''
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     if email == '':
-        return render_template('html/forget.html', body=body, data=data, headers=headers), 200, {}
+        return render_template('templates/forget.html', body=body, data=data, headers=headers), 200, {}
     if not email_correct_format(email):
-        return render_template('html/forget.html', body=body, data=data, headers=headers,
+        return render_template('templates/forget.html', body=body, data=data, headers=headers,
                                message='Email address is in an invalid format'), 200, {}
     send_mail(email, ip)
-    return render_template('html/forget.html', body=body, data=data, headers=headers,
+    return render_template('templates/forget.html', body=body, data=data, headers=headers,
                            message='A reset password link has been sent to you via email'), 200, {}
 
 
@@ -48,13 +48,14 @@ def send_mail(email, ip):
     cursor = conn.cursor()
     cursor.execute("SELECT login, token FROM users WHERE email=%s;", (email,))
     fetch = cursor.fetchone()
-    login = fetch[0]
 
-    if login is None:
+    if fetch is None:
         msg = 'Hi info,\nA incorrect request to reset password was noticed from IP: ' + ip
         server.sendmail(auto_login('mail_user'), auto_login('mail_user'), msg)
         server.quit()
         return
+
+    login = fetch[0]
 
     login = str(login)
     token = str(fetch[1])

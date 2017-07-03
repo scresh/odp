@@ -107,7 +107,7 @@ class Vial(object):
         headers = {
             'content-length': environ.get('CONTENT_LENGTH', 0),
             'request-method': environ.get('REQUEST_METHOD', None),
-            'content-type': environ.get('CONTENT_TYPE', 'text/html'),
+            'content-type': environ.get('CONTENT_TYPE', 'text/templates'),
             'remote-addr': environ.get('REMOTE_ADDR', None),
             'request-uri': environ.get('REQUEST_URI', None),
             'http-accept': environ.get('HTTP_ACCEPT', None),

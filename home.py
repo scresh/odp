@@ -31,8 +31,11 @@ def home(headers, body, data):
 
     cursor.execute("SELECT ip FROM logs WHERE login=%s AND success=1 ORDER BY time DESC LIMIT 2", (login,))
     fetch = cursor.fetchall()
-    if len(fetch) >= 2:
-        if str(fetch[0][0]) != str(fetch[1][0]):
-            return render_template('html/home.html', body=body, data=data, headers=headers, snippets_values=snippets_values, uploads_values=uploads_values, token=token,
+    if login != '':
+        if len(fetch) >= 2:
+            if str(fetch[0][0]) != str(fetch[1][0]):
+                return render_template('templates/signed.html', body=body, data=data, headers=headers, snippets_values=snippets_values, uploads_values=uploads_values, token=token,
                                    message='New login location detected. IP: ' + str(fetch[1][0])), 200, {}
-    return render_template('html/home.html', body=body, data=data, headers=headers, snippets_values=snippets_values, uploads_values=uploads_values,  token=token), 200, {}
+        return render_template('templates/signed.html', body=body, data=data, headers=headers, snippets_values=snippets_values, uploads_values=uploads_values,  token=token), 200, {}
+    return render_template('templates/unsigned.html', body=body, data=data, headers=headers, snippets_values=snippets_values), 200, {}
+

@@ -19,7 +19,7 @@ def upload(headers, body, data, token=''):
     if login == '':
         return redirect(headers=headers, body=body, data=data, message='Unauthorized file upload request')
     if len(file_name) > 60:
-        return render_template('html/upload.html', headers=headers, body=body, data=data, message='File name is too long', token=token), 200, {}
+        return render_template('templates/upload.html', headers=headers, body=body, data=data, message='File name is too long', token=token), 200, {}
 
     if body != '' and file_name != '':
         new_file = open('uploads/' + login + '/' + file_name, 'wb')
@@ -44,7 +44,7 @@ def upload(headers, body, data, token=''):
         conn.commit()
         cursor.execute("UPDATE users SET token=%s WHERE login=%s;", (token, login))
         conn.commit()
-        return redirect(headers=headers, body=body, data=data, message='Your file has been successfully uploaded')
+        return render_template('templates/upload.html', headers=headers, body=body, data=data, token=token), 200, {}
 
-    return render_template('html/upload.html', headers=headers, body=body, data=data, token=token), 200, {}
+    return render_template('templates/upload.html', headers=headers, body=body, data=data, token=token), 200, {}
 

@@ -4,15 +4,12 @@
         <meta charset="utf-8" />
         <title>Home</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
-        <link rel="stylesheet" href="https://odprojekt.tk/static/styles.css"/>
+        <link rel="stylesheet" href="static/styles.css"/>
     </head>
     <body>
         <section>
             <ul>
                 <li><a href="/">Home</a></li>
-                <li><a href="/signin">Sing-in</a></li>
-                <li><a href="/signup">Sign-up</a></li>
-                <li><a href="/forget">Forgot Passowrd</a></li>
                 <li><a href="/signout">Sign-out</a></li>
                 <li><a href="/add/{{token}}">Add snippet</a></li>
                 <li><a href="/upload/{{token}}">Upload file</a></li>
@@ -20,7 +17,9 @@
 
             </ul>
             <p id="message">{{ message }}</p>
-            <div class="tbl-header">
+
+                        <h1>Recent post</h1>
+           <div class="tbl-header">
                 <table cellpadding="0" cellspacing="0" border="0">
                     <thead>
                         <tr>
@@ -31,10 +30,8 @@
                     </thead>
                 </table>
             </div>
-                        <h1>Recent post</h1>
-
             <div class="tbl-content">
-                <table cellpadding="0" cellspacing="0" border="0">
+        <table cellpadding="0" cellspacing="0" border="0">
                     <tbody>
                         {% for row in snippets_values %}
                         <tr>
@@ -47,7 +44,16 @@
                 </table>
             </div>
                         <h1>Your recent uploads</h1>
-
+           <div class="tbl-header">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
                         <div class="tbl-content">
                 <table cellpadding="0" cellspacing="0" border="0">
                     <tbody>

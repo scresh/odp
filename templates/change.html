@@ -12,16 +12,21 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/signin">Sing-in</a></li>
                 <li><a href="/signup">Sign-up</a></li>
-                <li><a href="forget">Forgot Passowrd</a></li>
+                <li><a href="forget">Forgot Password</a></li>
             </ul>
             <h1>Change password</h1>
             <p id="message">{{ message }}</p>
             <div id="box">
                 <form action="/change" method="post">
-                    <span class="fontawesome-user"></span>
+                    <span class="fontawesome-lock"></span>
                     <input type="password" name="current" placeholder="Current password">
+
+                    <span class="fontawesome-unlock"></span>
                     <input type="password" name="password1" placeholder="New password">
+
+                    <span class="fontawesome-unlock"></span>
                     <input type="password" name="password2" placeholder="New password">
+
                     <input type="hidden" name="token" value="{{token}}">
                     <input type="submit" value="Send">
                 </form>

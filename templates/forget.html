@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Zapomiałem hasła</title>
+        <title>Forgot password</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
         <link rel="stylesheet" href="/static/styles.css"/>
     </head>
@@ -12,13 +12,13 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/signin">Sing-in</a></li>
                 <li><a href="/signup">Sign-up</a></li>
-                <li><a href="forget">Forgot Passowrd</a></li>
+                <li><a href="forget">Forgot Password</a></li>
             </ul>
-            <h1> Zapomniałem hasła </h1>
+            <h1> FORGOT PASSWORD </h1>
             <p id="message">{{ message }}</p>
             <div id="box">
                 <form action="/forget" method="post">
-                    <span class="fontawesome-user"></span>
+                    <span class="fontawesome-inbox"></span>
                     <input type="text" name="email" placeholder="E-mail">
                     <input type="submit" value="Send">
                 </form>

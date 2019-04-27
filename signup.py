@@ -43,7 +43,8 @@ def signup(headers, body, data):
     token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
     add_user(login, password, email, cookie, expires.strftime("%Y-%m-%d %H:%M:%S"), token)
     expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
-    cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
+
+    cookie = 'sessionid={}; Domain=127.0.0.1; Path=/; Expires={}'.format(cookie, expires)
     return render_template('templates/redirect.html', body=body, data=data, headers=headers,
                            message='Successfully signed up'), 200, {'Set-Cookie': cookie}
 

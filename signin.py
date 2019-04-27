@@ -27,8 +27,7 @@ def signin(headers, body, data):
             expires = (dt.datetime.utcnow() + dt.timedelta(days=1))
             update_cookie(cookie, expires, login)
             expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
-            print cookie
+            cookie = 'sessionid={}; Domain=127.0.0.1; Path=/; Expires={}'.format(cookie, expires)
             add_log(headers, data, True)
             return render_template('templates/redirect.html', body=body, data=data, headers=headers,
                                    message='Successfully signed in'), 200, {'Set-Cookie': cookie}

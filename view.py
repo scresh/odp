@@ -17,5 +17,5 @@ def view(headers, body, data, snippet_id='0'):
 
     if login is None:
         return redirect(headers=headers, body=body, data=data, message='Snippet does not exist')
-    snippet_path = 'static/snippets/' + str(snippet_id) + '.snippet'
+    snippet_path = '/static/snippets/' + str(snippet_id) + '.snippet'
     return render_template('templates/view.html', body=body, data=data, snippet_path=snippet_path), 200, {}

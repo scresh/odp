@@ -1,5 +1,6 @@
 import binascii
 import os
+import sqlite3
 import uuid
 
 from vial import render_template
@@ -28,18 +29,15 @@ def upload(headers, body, data, token=''):
         new_file.close()
         token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
         date_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        conn = pymysql.connect(
-            db=auto_login('db_db'),
-            user=auto_login('db_user'),
-            passwd=auto_login('db_passwd'),
-            host=auto_login('db_host'))
+
+        conn = sqlite3.connect(auto_login('db_file'))
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM uploads ORDER BY id DESC LIMIT 1;")
         fetch = cursor.fetchone()
         file_id = (int(fetch[0]) + 1) if fetch is not None else 0
         cursor.execute("SELECT login FROM uploads WHERE login=? AND filename=?", (login, file_name))
         if cursor.fetchone() is None:
-            cursor.execute("INSERT INTO uploads VALUES (?, ?, ?, ?);", (file_id, file_name, login, date_time))
+            cursor.execute("INSERT INTO uploads VALUES (?, ?, ?, ?);", (file_id, login, file_name, date_time))
         else:
             cursor.execute("UPDATE uploads SET time=? WHERE login=? AND filename=?;", (date_time, login, file_name))
         conn.commit()

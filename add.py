@@ -50,6 +50,11 @@ def add_snippet(title, snippet_content, login):
     cursor.execute('INSERT INTO snippets VALUES (?, ?, ?, ?);', (snippet_id, title, login, date_time))
     conn.commit()
     snippet_path = 'static/snippets/' + str(snippet_id) + '.snippet'
-    snippet_file = open(snippet_path, 'w+')
+    try:
+        snippet_file = open(snippet_path, 'w+')
+    except IOError:
+        os.mkdir('static/snippets')
+        snippet_file = open(snippet_path, 'w+')
+
     snippet_file.write(snippet_content)
     snippet_file.close()

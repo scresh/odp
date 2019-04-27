@@ -43,7 +43,7 @@ routes = {
 
     '/download': download,
     '/download/': download,
-    '/download/{id}': download,
+    '/download/{file_id}': download,
 
 }
 

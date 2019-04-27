@@ -28,7 +28,7 @@ def download(headers, body, data, file_id=''):
                         message='You do not have permission to download this file')
     file_path = 'uploads/' + login + '/' + str(fetch[1])
     f = open(file_path, 'rb')
-    #content = to_unicode(f.read())
+
     content = str(to_unicode(f.read())).encode()
     content_type = str(guess_type(file_path)[0])
     return content, 200, {'request-method': 'GET',

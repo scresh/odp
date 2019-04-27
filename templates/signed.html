@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <title>Home</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
-        <link rel="stylesheet" href="static/styles.css"/>
+        <link rel="stylesheet" href="/static/styles.css"/>
     </head>
     <body>
         <section>
@@ -35,7 +35,7 @@
                     <tbody>
                         {% for row in snippets_values %}
                         <tr>
-                            <td><a href="https://odprojekt.tk/view/{{ row['id'] }}">{{ row['name']|e }}</a></td>
+                            <td><a href="/view/{{ row['id'] }}">{{ row['name']|e }}</a></td>
                             <td>{{ row['login']| e }}</td>
                             <td>{{ row['time'] | e }}</td>
                         </tr>

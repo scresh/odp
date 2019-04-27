@@ -13,7 +13,7 @@ def user_cookie(cookie):
     data = cursor.fetchone()
 
     if data is not None:
-        if datetime.strptime(str(data[1]), "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
+        if datetime.strptime(str(data[1]).split('.')[0], "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
             return str(data[0])
     return ''
 
@@ -27,7 +27,7 @@ def token_cookie(cookie):
     data = cursor.fetchone()
 
     if data is not None:
-        if datetime.strptime(str(data[1]), "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
+        if datetime.strptime(str(data[1]).split('.')[0], "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
             return str(data[0])
     return ''
 
@@ -41,7 +41,7 @@ def tk_pass(token, cookie):
     data = cursor.fetchone()
 
     if data is not None:
-        if cookie == str(data[1]) and datetime.strptime(str(data[2]), "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
+        if cookie == str(data[1]) and datetime.strptime(str(data[2].split('.')[0]), "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
             return str(data[0])
     return ''
 
@@ -55,7 +55,7 @@ def tk_login(token, cookie):
     data = cursor.fetchone()
 
     if data is not None:
-        if cookie == str(data[1]) and datetime.strptime(str(data[2]), "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
+        if cookie == str(data[1]) and datetime.strptime(str(data[2]).split('.')[0], "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
             return str(data[0])
     return ''
 
@@ -69,7 +69,7 @@ def tk_login(token, cookie):
     data = cursor.fetchone()
 
     if data is not None:
-        if cookie == str(data[1]) and datetime.strptime(str(data[2]), "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
+        if cookie == str(data[1]) and datetime.strptime(str(data[2]).split('.')[0], "%Y-%m-%d %H:%M:%S") > dt.datetime.now():
             return str(data[0])
     return ''
 

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+import binascii
+
 from vial import render_template
 from auto_login import auto_login
 import datetime as dt
 import math
-import pymysql
+import sqlite3
 import bcrypt
 import uuid
-import OpenSSL
 import os
 
 
@@ -37,9 +38,9 @@ def signup(headers, body, data):
     elif not email_not_used(email):
         return render_template('templates/signup.html', body=body, data=data, headers=headers,
                                message='Email address is already in use'), 200, {}
-    cookie = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+    cookie = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
     expires = (dt.datetime.utcnow() + dt.timedelta(days=1))
-    token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+    token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
     add_user(login, password, email, cookie, expires.strftime("%Y-%m-%d %H:%M:%S"), token)
     expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
     cookie = 'sessionid=' + cookie + '; expires=' + expires + "; secure"
@@ -51,14 +52,14 @@ def add_user(login, password, email, cookie, expires, token):
     salt = bcrypt.gensalt()
     for i in range(3):
         password = bcrypt.hashpw(password, salt)
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s);", (login, password, email, cookie, expires, token))
-    os.mkdir('uploads/'+login)
+    cursor.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?);", (login, password, email, cookie, expires, token))
+    try:
+        os.mkdir('uploads/'+login)
+    except OSError:
+        os.mkdir('uploads')
+        os.mkdir('uploads/'+login)
     conn.commit()
 
 
@@ -98,13 +99,9 @@ def login_correct_length(login):
 
 
 def login_not_used(login):
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM users WHERE login=%s;", (login,))
+    cursor.execute("SELECT login FROM users WHERE login=?;", (login,))
 
     if cursor.fetchone() is None:
         return True
@@ -125,13 +122,9 @@ def email_correct_format(email):
 
 
 def email_not_used(email):
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM users WHERE email=%s;", (email,))
+    cursor.execute("SELECT login FROM users WHERE email=?;", (email,))
 
     if cursor.fetchone() is None:
         return True

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import binascii
+import os
 import uuid
-import OpenSSL
 from vial import render_template
 from auto_login import auto_login
-import pymysql
+import sqlite3
 import math
 import bcrypt
 from redirect import redirect
@@ -20,13 +21,9 @@ def reset(headers, body, data, token=''):
     if password == '':
         return render_template('templates/reset.html', body=body, data=data,  token=token), 200, {}
 
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login FROM users WHERE token=%s;", (token,))
+    cursor.execute("SELECT login FROM users WHERE token=?;", (token,))
     login = cursor.fetchone()
 
     if login is None:
@@ -43,9 +40,9 @@ def reset(headers, body, data, token=''):
         password = bcrypt.hashpw(password, salt)
 
     login = str(login[0])
-    token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+    token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
 
-    cursor.execute("UPDATE users SET password=%s, token=%s WHERE login=%s;", (password, token, login))
+    cursor.execute("UPDATE users SET password=?, token=? WHERE login=?;", (password, token, login))
     conn.commit()
     return redirect(headers=headers, body=body, data=data, message='Password has been successfully changed.')
 

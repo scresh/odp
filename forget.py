@@ -2,9 +2,7 @@
 from vial import render_template
 from auto_login import auto_login
 import smtplib
-import uuid
-import pymysql
-import OpenSSL
+import sqlite3
 
 
 def forget(headers, body, data):
@@ -40,13 +38,9 @@ def send_mail(email, ip):
     server.ehlo()
     server.login(auto_login('mail_user'), auto_login('mail_passwd'))
 
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
-    cursor.execute("SELECT login, token FROM users WHERE email=%s;", (email,))
+    cursor.execute("SELECT login, token FROM users WHERE email=?;", (email,))
     fetch = cursor.fetchone()
 
     if fetch is None:

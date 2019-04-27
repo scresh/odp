@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
+import binascii
+import os
+
 from redirect import redirect
 from vial import render_template
 from cookie import user_cookie, update_cookie
 from auto_login import auto_login
 from datetime import datetime
 import datetime as dt
-import pymysql
+import sqlite3
 import bcrypt
 import uuid
-import OpenSSL
 
 
 def signin(headers, body, data):
@@ -21,7 +23,7 @@ def signin(headers, body, data):
         return render_template('templates/signin.html', body=body, data=data, headers=headers), 200, {}
     elif allow_signin(login, headers):
         if authentication(login, password):
-            cookie = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+            cookie = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
             expires = (dt.datetime.utcnow() + dt.timedelta(days=1))
             update_cookie(cookie, expires, login)
             expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
@@ -38,13 +40,9 @@ def signin(headers, body, data):
 
 def allow_signin(login, headers):
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
-    cursor.execute("SELECT success, time FROM logs WHERE ip=%s AND login=%s ORDER BY time DESC LIMIT 10;", (ip, login))
+    cursor.execute("SELECT success, time FROM logs WHERE ip=? AND login=? ORDER BY time DESC LIMIT 10;", (ip, login))
     cursor_length = 0
     last_login = ''
     for result in cursor.fetchall():
@@ -66,31 +64,23 @@ def add_log(headers, data, success=False):
     login = str(data['login']) if 'login' in data else '-'
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     date_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
     if success:
-        cursor.execute("INSERT INTO logs VALUES (%s, %s, TRUE, %s);", (login, ip, date_time))
+        cursor.execute("INSERT INTO logs VALUES (?, ?, 1, ?);", (login, ip, date_time))
     else:
-        cursor.execute("INSERT INTO logs VALUES (%s, %s, FALSE, %s);", (login, ip, date_time))
+        cursor.execute("INSERT INTO logs VALUES (?, ?, 0, ?);", (login, ip, date_time))
     conn.commit()
 
 
 def authentication(login, password):
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
-    cursor.execute("SELECT password FROM users WHERE login=%s;", (login,))
+    cursor.execute("SELECT password FROM users WHERE login=?;", (login,))
     dbhash = cursor.fetchone()
 
     if dbhash is None:
-        dbhash = '$2b$12$c/d7ZeuRgBPXvlktF7OH3uUF3DQFyq5FJnqmzbvKWMA6Et.e7Knrm';
+        dbhash = '$2b$12$c/d7ZeuRgBPXvlktF7OH3uUF3DQFyq5FJnqmzbvKWMA6Et.e7Knrm'
         salt = dbhash[0:29]
         hash = password
         for i in range(3):

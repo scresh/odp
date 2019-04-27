@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+import binascii
+import os
 import uuid
-import OpenSSL
-import pymysql
+import sqlite3
 
 from auto_login import auto_login
 from vial import render_template
@@ -38,16 +39,12 @@ def change(headers, body, data, token=''):
     salt = bcrypt.gensalt()
     for i in range(3):
         password1 = bcrypt.hashpw(password1, salt)
-    new_token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+    new_token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
 
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE users SET password=%s, token=%s WHERE token=%s;", (password1, new_token, token))
+    cursor.execute("UPDATE users SET password=?, token=? WHERE token=?;", (password1, new_token, token))
     conn.commit()
     return redirect(headers=headers, body=body, data=data, message='Password has been successfully changed')
 

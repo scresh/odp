@@ -1,12 +1,6 @@
 def auto_login(parameter):
-    if parameter == 'db_db':
-        return 'database_name'
-    elif parameter == 'db_user':
-        return 'root'
-    elif parameter == 'db_passwd':
-        return 'ExamplePassword1234'
-    elif parameter == 'db_host':
-        return 'localhost'
+    if parameter == 'db_file':
+        return 'database.db'
     elif parameter == 'mail_user':
         return 'mail.bot@gmail.com'
     elif parameter == 'mail_passwd':

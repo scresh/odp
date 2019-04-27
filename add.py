@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
+import os
+import binascii
+import sqlite3
 import uuid
-
 from vial import render_template
 from auto_login import auto_login
 import datetime as dt
 from cookie import tk_login
 from redirect import redirect
-import pymysql
-import OpenSSL
 
 
 def add(headers, body, data, token=''):
@@ -30,34 +30,26 @@ def add(headers, body, data, token=''):
         return render_template('templates/add.html', body=body, data=data, headers=headers, token=token,
                                message='Snippet length should not be longer than 6000 characters'), 200, {}
     add_snippet(title, snippet, login)
-    new_token = str(uuid.UUID(bytes=OpenSSL.rand.bytes(16)).hex)
+    new_token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
 
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE users SET token=%s WHERE token=%s;", (new_token, token))
+    cursor.execute("UPDATE users SET token=? WHERE token=?;", (new_token, token))
     conn.commit()
     return redirect(headers=headers, body=body, data=data, message='Your snippet has been successfully added.')
 
 
 def add_snippet(title, snippet_content, login):
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
     cursor.execute("SELECT id, time FROM snippets ORDER BY id DESC LIMIT 1;")
     fetch = cursor.fetchone()
-    id = (int(fetch[0]) + 1)if fetch is not None else 0
+    snippet_id = (int(fetch[0]) + 1) if fetch is not None else 0
     date_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cursor.execute("INSERT INTO snippets VALUES (%s, %s, %s, %s);", (title, id, login, date_time))
+    cursor.execute('INSERT INTO snippets VALUES (?, ?, ?, ?);', (snippet_id, title, login, date_time))
     conn.commit()
-    snippet_path = 'static/snippets/' + str(id) + '.snippet'
+    snippet_path = 'static/snippets/' + str(snippet_id) + '.snippet'
     snippet_file = open(snippet_path, 'w+')
     snippet_file.write(snippet_content)
     snippet_file.close()

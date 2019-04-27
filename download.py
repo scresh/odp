@@ -7,24 +7,19 @@ from vial import to_unicode
 from cookie import user_cookie
 from redirect import redirect
 from auto_login import auto_login
-import pymysql
-from cherrypy.lib.static import serve_file
+import sqlite3
 
 
-def download(headers, body, data, id=''):
+def download(headers, body, data, file_id=''):
     cookie = str(headers['http-cookie']).replace('sessionid=', '')
     login = user_cookie(cookie)
     if login == '':
         return redirect(headers=headers, body=body, data=data, message='Unauthorized file download request')
 
-    conn = pymysql.connect(
-        db=auto_login('db_db'),
-        user=auto_login('db_user'),
-        passwd=auto_login('db_passwd'),
-        host=auto_login('db_host'))
+    conn = sqlite3.connect(auto_login('db_file'))
     cursor = conn.cursor()
 
-    cursor.execute("SELECT login, filename from uploads WHERE id=%s", (id,))
+    cursor.execute("SELECT login, filename from uploads WHERE id=?", (file_id,))
     fetch = cursor.fetchone()
     if fetch is None:
         return redirect(headers=headers, body=body, data=data, message='File does no exist')

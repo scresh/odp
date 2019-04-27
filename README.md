@@ -55,7 +55,7 @@ uwsgi --ini drink.ini
 ```
 
 ## Screenshots
-|<img width="1604" alt="home page" src="https://raw.githubusercontent.com/scresh/odp/master/static/img/home_page.png">|<img width="1604" alt="register page" src="https://github.com/scresh/Digamma/blob/master/src/web/src/assets/img/about-us.png">|
+|<img width="1604" alt="home page" src="https://raw.githubusercontent.com/scresh/odp/master/static/img/home_page.png">|<img width="1604" alt="register page" src="https://raw.githubusercontent.com/scresh/odp/master/static/img/register_page.png">|
 |:-------------------------:|:-------------------------:|
 |<img width="1604" alt="upload file" src="https://raw.githubusercontent.com/scresh/odp/master/static/img/upload_file.png">  |  <img width="1604" alt="view snippet" src="https://raw.githubusercontent.com/scresh/odp/master/static/img/view_snippet.png">
 

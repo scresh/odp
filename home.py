@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from vial import render_template
 import sqlite3
-from auto_login import auto_login
+from params import param_dict
 from cookie import token_cookie, user_cookie
 
 
@@ -10,7 +10,7 @@ def home(headers, body, data):
     token = token_cookie(cookie)
     login = user_cookie(cookie)
 
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
 
     cursor.execute("SELECT id, name, login, time FROM snippets ORDER BY time DESC ")

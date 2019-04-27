@@ -6,7 +6,7 @@ import uuid
 from vial import render_template
 from cookie import tk_login
 from redirect import redirect
-from auto_login import auto_login
+from params import param_dict
 import pymysql
 import datetime as dt
 
@@ -30,7 +30,7 @@ def upload(headers, body, data, token=''):
         token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
         date_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        conn = sqlite3.connect(auto_login('db_file'))
+        conn = sqlite3.connect(param_dict['db_file'])
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM uploads ORDER BY id DESC LIMIT 1;")
         fetch = cursor.fetchone()

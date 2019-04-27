@@ -4,7 +4,7 @@ import binascii
 import sqlite3
 import uuid
 from vial import render_template
-from auto_login import auto_login
+from params import param_dict
 import datetime as dt
 from cookie import tk_login
 from redirect import redirect
@@ -32,7 +32,7 @@ def add(headers, body, data, token=''):
     add_snippet(title, snippet, login)
     new_token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
 
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
 
     cursor.execute("UPDATE users SET token=? WHERE token=?;", (new_token, token))
@@ -41,7 +41,7 @@ def add(headers, body, data, token=''):
 
 
 def add_snippet(title, snippet_content, login):
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT id, time FROM snippets ORDER BY id DESC LIMIT 1;")
     fetch = cursor.fetchone()

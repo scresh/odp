@@ -6,7 +6,7 @@ from mimetypes import guess_type
 from vial import to_unicode
 from cookie import user_cookie
 from redirect import redirect
-from auto_login import auto_login
+from params import param_dict
 import sqlite3
 
 
@@ -16,7 +16,7 @@ def download(headers, body, data, file_id=''):
     if login == '':
         return redirect(headers=headers, body=body, data=data, message='Unauthorized file download request')
 
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
 
     cursor.execute("SELECT login, filename from uploads WHERE id=?", (file_id,))

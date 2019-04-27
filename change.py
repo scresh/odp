@@ -4,7 +4,7 @@ import os
 import uuid
 import sqlite3
 
-from auto_login import auto_login
+from params import param_dict
 from vial import render_template
 import math
 import bcrypt
@@ -41,7 +41,7 @@ def change(headers, body, data, token=''):
         password1 = bcrypt.hashpw(password1, salt)
     new_token = str(uuid.UUID(hex=binascii.b2a_hex(os.urandom(16))))
 
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
 
     cursor.execute("UPDATE users SET password=?, token=? WHERE token=?;", (password1, new_token, token))

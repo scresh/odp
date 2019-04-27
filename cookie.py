@@ -1,4 +1,4 @@
-from auto_login import auto_login
+from params import param_dict
 from datetime import datetime
 import datetime as dt
 import sqlite3
@@ -7,7 +7,7 @@ import sqlite3
 def user_cookie(cookie):
     if cookie == '':
         return ''
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT login, expires FROM users WHERE cookie=?;", (cookie,))
     data = cursor.fetchone()
@@ -21,7 +21,7 @@ def user_cookie(cookie):
 def token_cookie(cookie):
     if cookie == '':
         return ''
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT token, expires FROM users WHERE cookie=?;", (cookie,))
     data = cursor.fetchone()
@@ -35,7 +35,7 @@ def token_cookie(cookie):
 def tk_pass(token, cookie):
     if token == '' or cookie == '':
         return ''
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT password, cookie, expires FROM users WHERE token=?;", (token,))
     data = cursor.fetchone()
@@ -49,7 +49,7 @@ def tk_pass(token, cookie):
 def tk_login(token, cookie):
     if token == '' or cookie == '':
         return ''
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT login, cookie, expires FROM users WHERE token=?;", (token,))
     data = cursor.fetchone()
@@ -63,7 +63,7 @@ def tk_login(token, cookie):
 def tk_login(token, cookie):
     if token == '' or cookie == '':
         return ''
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT login, cookie, expires FROM users WHERE token=?;", (token,))
     data = cursor.fetchone()
@@ -75,7 +75,7 @@ def tk_login(token, cookie):
 
 
 def update_cookie(cookie, expires, login):
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     expires = str(expires)
     cursor.execute("UPDATE users SET cookie=?, expires=? WHERE login=?;", (cookie, expires, login))
@@ -83,7 +83,7 @@ def update_cookie(cookie, expires, login):
 
 
 def disable_cookie(cookie):
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     expires = str(dt.datetime.utcnow())
     cursor.execute("UPDATE users SET expires=? WHERE cookie=?;", (expires, cookie))

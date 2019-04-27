@@ -5,7 +5,7 @@ import os
 from redirect import redirect
 from vial import render_template
 from cookie import user_cookie, update_cookie
-from auto_login import auto_login
+from params import param_dict
 from datetime import datetime
 import datetime as dt
 import sqlite3
@@ -27,7 +27,7 @@ def signin(headers, body, data):
             expires = (dt.datetime.utcnow() + dt.timedelta(days=1))
             update_cookie(cookie, expires, login)
             expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            cookie = 'sessionid={}; Domain=127.0.0.1; Path=/; Expires={}'.format(cookie, expires)
+            cookie = 'sessionid={}; Domain={}; Path=/; Expires={}'.format(cookie, param_dict['domain'], expires)
             add_log(headers, data, True)
             return render_template('templates/redirect.html', body=body, data=data, headers=headers,
                                    message='Successfully signed in'), 200, {'Set-Cookie': cookie}
@@ -40,7 +40,7 @@ def signin(headers, body, data):
 
 def allow_signin(login, headers):
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT success, time FROM logs WHERE ip=? AND login=? ORDER BY time DESC LIMIT 10;", (ip, login))
     cursor_length = 0
@@ -64,7 +64,7 @@ def add_log(headers, data, success=False):
     login = str(data['login']) if 'login' in data else '-'
     ip = str(headers['http-x-forwarded-for']) if 'http-x-forwarded-for' in headers else 'PROXY'
     date_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     if success:
         cursor.execute("INSERT INTO logs VALUES (?, ?, 1, ?);", (login, ip, date_time))
@@ -74,7 +74,7 @@ def add_log(headers, data, success=False):
 
 
 def authentication(login, password):
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT password FROM users WHERE login=?;", (login,))
     dbhash = cursor.fetchone()

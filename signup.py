@@ -2,7 +2,7 @@
 import binascii
 
 from vial import render_template
-from auto_login import auto_login
+from params import param_dict
 import datetime as dt
 import math
 import sqlite3
@@ -44,7 +44,7 @@ def signup(headers, body, data):
     add_user(login, password, email, cookie, expires.strftime("%Y-%m-%d %H:%M:%S"), token)
     expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-    cookie = 'sessionid={}; Domain=127.0.0.1; Path=/; Expires={}'.format(cookie, expires)
+    cookie = 'sessionid={}; Domain={}; Path=/; Expires={}'.format(cookie, param_dict['domain'], expires)
     return render_template('templates/redirect.html', body=body, data=data, headers=headers,
                            message='Successfully signed up'), 200, {'Set-Cookie': cookie}
 
@@ -53,7 +53,7 @@ def add_user(login, password, email, cookie, expires, token):
     salt = bcrypt.gensalt()
     for i in range(3):
         password = bcrypt.hashpw(password, salt)
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?);", (login, password, email, cookie, expires, token))
     try:
@@ -100,7 +100,7 @@ def login_correct_length(login):
 
 
 def login_not_used(login):
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT login FROM users WHERE login=?;", (login,))
 
@@ -123,7 +123,7 @@ def email_correct_format(email):
 
 
 def email_not_used(email):
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT login FROM users WHERE email=?;", (email,))
 

@@ -3,7 +3,7 @@ import binascii
 import os
 import uuid
 from vial import render_template
-from auto_login import auto_login
+from params import param_dict
 import sqlite3
 import math
 import bcrypt
@@ -21,7 +21,7 @@ def reset(headers, body, data, token=''):
     if password == '':
         return render_template('templates/reset.html', body=body, data=data,  token=token), 200, {}
 
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT login FROM users WHERE token=?;", (token,))
     login = cursor.fetchone()

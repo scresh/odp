@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from vial import render_template
-from auto_login import auto_login
+from params import param_dict
 import smtplib
 import sqlite3
 
@@ -32,20 +32,20 @@ def email_correct_format(email):
 
 
 def send_mail(email, ip):
-    server = smtplib.SMTP(auto_login('mail_smtp'), auto_login('mail_port'))
+    server = smtplib.SMTP(param_dict['mail_smtp'], param_dict['mail_port'])
     server.ehlo()
     server.starttls()
     server.ehlo()
-    server.login(auto_login('mail_user'), auto_login('mail_passwd'))
+    server.login(param_dict['mail_user'], param_dict['mail_passwd'])
 
-    conn = sqlite3.connect(auto_login('db_file'))
+    conn = sqlite3.connect(param_dict['db_file'])
     cursor = conn.cursor()
     cursor.execute("SELECT login, token FROM users WHERE email=?;", (email,))
     fetch = cursor.fetchone()
 
     if fetch is None:
         msg = 'Hi info,\nA incorrect request to reset password was noticed from IP: ' + ip
-        server.sendmail(auto_login('mail_user'), auto_login('mail_user'), msg)
+        server.sendmail(param_dict['mail_user'], param_dict['mail_user'], msg)
         server.quit()
         return
 
@@ -55,5 +55,5 @@ def send_mail(email, ip):
     token = str(fetch[1])
 
     msg = 'Hi ' + login + ',\nWe have received a request to reset your password from IP: ' + ip + '\nPlease confirm: https://odprojekt.tk/reset/' + token
-    server.sendmail(auto_login('mail_user'), email, msg)
+    server.sendmail(param_dict['mail_user'], email, msg)
     server.quit()
